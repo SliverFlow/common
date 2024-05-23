@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/SliverFlow/core/config"
+	"github.com/redis/go-redis/v9"
 )
 
 // Redis 初始化 Redis 连接

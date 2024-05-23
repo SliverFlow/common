@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/SliverFlow/core/config"
 	"github.com/SliverFlow/core/initialize/internal"
+	"github.com/SliverFlow/core/util"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
