@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/SliverFlow/core/config"
+	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 )
 
 // Redis 初始化 Redis 连接
-func Redis(c *config.Redis) *redis.Client {
+func Redis(c *config.Redis) (*redis.Client, error) {
 
 	cli := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", c.Host, c.Port),
@@ -18,9 +19,8 @@ func Redis(c *config.Redis) *redis.Client {
 
 	_, err := cli.Ping(context.Background()).Result()
 	if err != nil {
-		panic(err)
-		return nil
+		return nil, errors.WithStack(err)
 	}
 
-	return cli
+	return cli, nil
 }

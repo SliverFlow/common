@@ -1,11 +1,16 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"github.com/SliverFlow/core/config"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -36,5 +41,26 @@ func NewHttp(logger *zap.Logger, c *config.HttpServer, api ApiGroup) *Http {
 
 // ListenServer 监听服务
 func (h *Http) ListenServer() error {
-	return h.Server.ListenAndServe()
+	var err error
+	go func() {
+		if err = h.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			_ = h.Server.Close()
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	fmt.Println("Shutting down the server...")
+	if err := h.Shutdown(context.Background()); err != nil {
+		log.Fatal("Server Shutdown Error:", err)
+	}
+	fmt.Println("Server exited successfully")
+	return nil
+}
+
+// Shutdown 关闭服务
+func (h *Http) Shutdown(ctx context.Context) error {
+	return h.Server.Shutdown(ctx)
 }

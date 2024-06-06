@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"github.com/SliverFlow/core/config"
+	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -11,7 +12,7 @@ import (
 )
 
 // Mysql 初始化 gorm mysql 连接
-func Mysql(c *config.Mysql) *gorm.DB {
+func Mysql(c *config.Mysql) (*gorm.DB, error) {
 	dsn := c.Dsn()
 
 	mc := mysql.Config{
@@ -31,13 +32,12 @@ func Mysql(c *config.Mysql) *gorm.DB {
 	})
 
 	if err != nil {
-		panic(err)
-		return nil
+		return nil, errors.WithStack(err)
 	}
 
 	db, _ := DB.DB()
 	db.SetMaxIdleConns(c.MaxIdleConns)
 	db.SetMaxOpenConns(c.MaxOpenConns)
 
-	return DB
+	return DB, nil
 }
